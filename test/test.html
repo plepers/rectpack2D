@@ -1,0 +1,100 @@
+
+
+<html>
+
+  <head>
+
+    <script src="../index.js"></script>
+
+
+  </head>
+
+  <body>
+    <p id="time"></p>
+    <canvas id="canvas"></canvas>
+
+    <script type="text/javascript">
+      var NUM_RECTS = 200
+      var PACK_SIZE = 400;
+
+      var cvs = document.getElementById( 'canvas' );
+      cvs.width = PACK_SIZE;
+      cvs.height = PACK_SIZE;
+      var ctx = cvs.getContext('2d');
+
+      function random( min, max ){
+        return Math.floor(min + Math.random() *(max-min));
+      }
+
+
+
+      window.onclick = makeSomePacks;
+
+      var rects = [];
+
+      function genRects(){
+
+
+        rects = [];
+        // 20*30 very slow
+
+        for (var i = 0; i < NUM_RECTS; i++) {
+          
+          var rect = new rect_xywhf(
+            0, 0, 
+            random(20, 100 ),
+            random(20, 100 )
+          );
+
+          rects.push( rect );
+
+        };
+      }
+
+      function makeSomePacks(){
+
+        NUM_RECTS ++
+        genRects();
+
+        var bins = [];
+
+        var st = performance.now();
+
+        pack( rects, PACK_SIZE, bins );
+
+        var dt = performance.now() - st;
+
+        document.getElementById( 'time' ).innerHTML = NUM_RECTS + " " +dt;
+        console.log( "pack in "+ dt + "ms")
+
+        console.log( bins );
+
+        cvs.width = PACK_SIZE*bins.length;
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, PACK_SIZE*bins.length, PACK_SIZE);
+
+        for (var j = 0; j < bins.length; j++) {
+          
+          var bin0 = bins[j].rects;
+          var xoff = j*PACK_SIZE;
+          for (var i = 0; i < bin0.length; i++) {
+            var r = bin0[i];
+            ctx.fillStyle = "#"+((1<<24)*Math.random()|0).toString(16);
+            ctx.fillRect(xoff+r.x, r.y, r.w, r.h );
+          };
+        };
+
+
+
+        
+      }
+
+      genRects();
+      makeSomePacks();
+
+    </script>
+
+  </body>
+
+</html>
